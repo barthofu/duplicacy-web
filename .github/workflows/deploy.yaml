@@ -37,7 +37,7 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/duplicacy-web:${{ steps.meta.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/duplicacy-web:latest
+            ghcr.io/${{ github.repository_owner }}/duplicacy:${{ steps.meta.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/duplicacy:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

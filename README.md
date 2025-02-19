@@ -4,7 +4,7 @@
 
 ## Quick Start
 
-1. `docker run -p 3875:3875 barthodev/duplicacy` 
+1. `docker run -p 3875:3875 ghcr.io/barthodev/duplicacy` 
 2. Visit [`http://localhost:3875`](http://localhost:3875)
 
 ## Production Usage
@@ -14,7 +14,7 @@
 1. Set your container's timezone using one of the following techniques:
    1. Set the `TZ` environment variable to your desired [timezone name](https://wikipedia.org/wiki/List_of_tz_database_time_zones#List).
 
-       `docker run -e TZ=America/LosAngeles ... erichough/duplicacy`
+       `docker run -e TZ=America/LosAngeles ... ghcr.io/barthofu/duplicacy`
 
    1. Bind-mount `/etc/localtime` and `/etc/timezone` into the container. e.g.
 
@@ -23,7 +23,7 @@
         -v /etc/localtime:/etc/localtime:ro  \
         -v /etc/timezone:/etc/timezone:ro    \
         ...                                  \
-        erichough/duplicacy
+        ghcr.io/barthofu/duplicacy
       ```
 1. Add `--cap-drop=ALL` for extra security.
 1. Add `--restart=always` to be able to make changes via the settings page.
@@ -58,7 +58,7 @@ Duplicacy identifies the machine via the hostname and [`machine-id`](https://www
 version: '3.7'
 services:
   duplicacy:
-    image: erichough/duplicacy
+    image: ghcr.io/barthofu/duplicacy
     hostname: duplicacy-web
     restart: always
     ports:
@@ -87,3 +87,7 @@ services:
 1. Go to [Duplicacy github releases](https://github.com/gilbertchen/duplicacy/releases)
 2. Note the latest version number.
 3. Update the `VERSION_DUPLICACY` in the `Dockerfile` accordingly.
+
+### Deploy
+
+Deployment is automated via GitHub Actions. Simply push a tag following the pattern `X.Y.Z` to trigger a deployment on `ghcr.io/barthofu/duplicacy`.

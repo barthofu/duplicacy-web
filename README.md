@@ -1,12 +1,11 @@
-# erichough/duplicacy
+# Duplicacy Docker
 
-[Duplicacy Web Edition](https://forum.duplicacy.com/t/duplicacy-web-edition-1-0-0-is-now-available/2053/2) in a container.
+[Duplicacy Web Edition](https://forum.duplicacy.com/t/duplicacy-web-edition-1-0-0-is-now-available/2053/2) in a Docker container.
 
 ## Quick Start
 
-1. `docker run -p 3875:3875 erichough/duplicacy` 
-
-1. Visit [`http://localhost:3875`](http://localhost:3875)
+1. `docker run -p 3875:3875 barthodev/duplicacy` 
+2. Visit [`http://localhost:3875`](http://localhost:3875)
 
 ## Production Usage
 
@@ -74,3 +73,9 @@ services:
       - /host/path/to/cache:/var/cache/duplicacy
       - /host/path/to/some-storage:/storage
 ```
+
+## Development
+
+
+
+## License

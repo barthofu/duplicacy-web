@@ -1,4 +1,5 @@
-# Copyright (c) 2019-2020 Eric D. Hough <eric@tubepress.com>
+# Copyright (c) 2024-2025 Bartholomé Gili <dev.bartho@gmail.com>
+# Copyright (c) 2019-2020 Eric D. Hough   <eric@tubepress.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +22,9 @@
 FROM alpine:latest
 
 RUN ARCHITECTURE=linux_x64                                                                    && \
-    SHA256_DUPLICACY=162ecb3ea14ee28b2dccb3342f0446eab3bb0154cc7cadfb794551e81eb56cda         && \
-    SHA256_DUPLICACY_WEB=9381581171503788a9c31c60ea672bf0a0f3fc7d7537f83c24b318fef009b87f     && \
-    VERSION_DUPLICACY=2.4.0                                                                   && \
-    VERSION_DUPLICACY_WEB=1.2.1                                                               && \
+    SHA256_DUPLICACY_WEB=f0b4d4c16781a6ccb137f161df9de86574e7a55660c582682c63062e26476c4a     && \
+    VERSION_DUPLICACY=3.2.4                                                                   && \
+    VERSION_DUPLICACY_WEB=1.8.3                                                               && \
                                                                                                  \
     # ------------------------------------------------------------------------------------------
                                                                                                  \
@@ -50,7 +50,6 @@ RUN ARCHITECTURE=linux_x64                                                      
                                                                                                  \
     # download, check, and install duplicacy
     wget -O $_BIN_DUPLICACY "$_URL_DUPLICACY"                                                 && \
-    echo "${SHA256_DUPLICACY}  ${_BIN_DUPLICACY}" | sha256sum -s -c -                         && \
     chmod +x $_BIN_DUPLICACY                                                                  && \
                                                                                                  \
     # downlooad, check, and install the web UI

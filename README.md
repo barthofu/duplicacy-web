@@ -76,6 +76,14 @@ services:
 
 ## Development
 
+### Update web version
 
+1. Go to [Duplicacy releases](https://duplicacy.com/download.html) in the "Duplicacy Web Edition" section.
+2. Note the latest version number and the SHA256 checksum of the Linux x64 executable.
+3. Update the `VERSION_DUPLICACY_WEB` and `SHA256_DUPLICACY_WEB` in the `Dockerfile` accordingly.
 
-## License
+### Update CLI version
+
+1. Go to [Duplicacy github releases](https://github.com/gilbertchen/duplicacy/releases)
+2. Note the latest version number.
+3. Update the `VERSION_DUPLICACY` in the `Dockerfile` accordingly.

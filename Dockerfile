@@ -21,66 +21,50 @@
 
 FROM alpine:latest
 
-RUN ARCHITECTURE=linux_x64                                                                    && \
-    SHA256_DUPLICACY_WEB=f0b4d4c16781a6ccb137f161df9de86574e7a55660c582682c63062e26476c4a     && \
-    VERSION_DUPLICACY=3.2.4                                                                   && \
-    VERSION_DUPLICACY_WEB=1.8.3                                                               && \
-                                                                                                 \
-    # ------------------------------------------------------------------------------------------
-                                                                                                 \
-    _URL_DUPLICACY="$(                                                                           \
-      printf https://github.com/gilbertchen/duplicacy/releases/download/v%s/duplicacy_%s_%s      \
-      $VERSION_DUPLICACY $ARCHITECTURE $VERSION_DUPLICACY                                        \
-    )"                                                                                        && \
-    _URL_DUPLICACY_WEB="$(                                                                       \
-      printf https://acrosync.com/duplicacy-web/duplicacy_web_%s_%s                              \
-      $ARCHITECTURE $VERSION_DUPLICACY_WEB                                                       \
-    )"                                                                                        && \
-    _BIN_DUPLICACY=/usr/local/bin/duplicacy                                                   && \
-    _BIN_DUPLICACY_WEB=/usr/local/bin/duplicacy_web                                           && \
-    _DIR_WEB=~/.duplicacy-web                                                                 && \
-    _DIR_CONF=/etc/duplicacy                                                                  && \
-    _DIR_CACHE=/var/cache/duplicacy                                                           && \
-                                                                                                 \
-    # add a few packages:
-    #  * ca-certificates - so Duplicacy doesn't complain about HTTPS
-    #  * tzdata          - so users can set timezone via TZ environment variable
-    apk update                                                                                && \
-    apk add --no-cache ca-certificates tzdata                                                 && \
-                                                                                                 \
-    # download, check, and install duplicacy
-    wget -O $_BIN_DUPLICACY "$_URL_DUPLICACY"                                                 && \
-    chmod +x $_BIN_DUPLICACY                                                                  && \
-                                                                                                 \
-    # downlooad, check, and install the web UI
-    wget -O $_BIN_DUPLICACY_WEB "$_URL_DUPLICACY_WEB"                                         && \
-    echo "${SHA256_DUPLICACY_WEB}  ${_BIN_DUPLICACY_WEB}" | sha256sum -s -c -                 && \
-    chmod +x $_BIN_DUPLICACY_WEB                                                              && \
-                                                                                                 \
-    # create some dirs
-    mkdir -p                                                                                     \
-      ${_DIR_CACHE}/repositories                                                                 \
-      ${_DIR_CACHE}/stats                                                                        \
-      ${_DIR_WEB}/bin                                                                            \
-      /var/lib/dbus                                                                           && \
-                                                                                                 \
-    # duplicacy_web expects to find the CLI binary in a certain location
-    # https://forum.duplicacy.com/t/run-web-ui-in-a-docker-container/1505/2
-    ln -s $_BIN_DUPLICACY ${_DIR_WEB}/bin/duplicacy_${ARCHITECTURE}_${VERSION_DUPLICACY}      && \
-                                                                                                 \
-    # redirect the log to stdout
-    ln -s /dev/stdout /var/log/duplicacy_web.log                                              && \
-                                                                                                 \
-    # stage the rest of the web directory
-    ln -s ${_DIR_CONF}/settings.json  ${_DIR_WEB}/settings.json                               && \
-    ln -s ${_DIR_CONF}/duplicacy.json ${_DIR_WEB}/duplicacy.json                              && \
-    ln -s ${_DIR_CONF}/licenses.json  ${_DIR_WEB}/licenses.json                               && \
-    ln -s ${_DIR_CONF}/filters        ${_DIR_WEB}/filters                                     && \
-    ln -s ${_DIR_CACHE}/stats         ${_DIR_WEB}/stats
+# Définition des variables d'environnement pour éviter les erreurs de substitution
+ENV ARCHITECTURE=linux_x64 \
+    VERSION_DUPLICACY=3.2.4 \
+    VERSION_DUPLICACY_WEB=1.8.3 \
+    SHA256_DUPLICACY_WEB=9cdcaa875ae5fc0fcf93941df3a5133fb3c3ff92c89f87babddc511ba6dd7ef8 \
+    _BIN_DUPLICACY=/usr/local/bin/duplicacy \
+    _BIN_DUPLICACY_WEB=/usr/local/bin/duplicacy_web \
+    _DIR_WEB=/root/.duplicacy-web \
+    _DIR_CONF=/etc/duplicacy \
+    _DIR_CACHE=/var/cache/duplicacy
+
+# Définition des URLs
+RUN set -eux; \
+    _URL_DUPLICACY="https://github.com/gilbertchen/duplicacy/releases/download/v${VERSION_DUPLICACY}/duplicacy_${ARCHITECTURE}_${VERSION_DUPLICACY}"; \
+    _URL_DUPLICACY_WEB="https://acrosync.com/duplicacy-web/duplicacy_web_${ARCHITECTURE}_${VERSION_DUPLICACY_WEB}"; \
+    \
+    # Installer les dépendances
+    apk update && apk add --no-cache ca-certificates tzdata wget bash && \
+    \
+    # Télécharger et installer duplicacy
+    wget -O "${_BIN_DUPLICACY}" "${_URL_DUPLICACY}" && chmod +x "${_BIN_DUPLICACY}" && \
+    \
+    # Télécharger et vérifier duplicacy web
+    wget -O "${_BIN_DUPLICACY_WEB}" "${_URL_DUPLICACY_WEB}" && \
+    echo "${SHA256_DUPLICACY_WEB}  ${_BIN_DUPLICACY_WEB}" | sha256sum -c - && chmod +x "${_BIN_DUPLICACY_WEB}" && \
+    \
+    # Création des répertoires
+    mkdir -p "${_DIR_CACHE}/repositories" "${_DIR_CACHE}/stats" "${_DIR_WEB}/bin" "/var/lib/dbus" && \
+    \
+    # Lien symbolique pour duplicacy_web
+    ln -s "${_BIN_DUPLICACY}" "${_DIR_WEB}/bin/duplicacy_${ARCHITECTURE}_${VERSION_DUPLICACY}" && \
+    ln -s /dev/stdout /var/log/duplicacy_web.log && \
+    \
+    # Lien symbolique pour la configuration
+    ln -s "${_DIR_CONF}/settings.json"  "${_DIR_WEB}/settings.json" && \
+    ln -s "${_DIR_CONF}/duplicacy.json" "${_DIR_WEB}/duplicacy.json" && \
+    ln -s "${_DIR_CONF}/licenses.json"  "${_DIR_WEB}/licenses.json" && \
+    ln -s "${_DIR_CONF}/filters"        "${_DIR_WEB}/filters" && \
+    ln -s "${_DIR_CACHE}/stats"         "${_DIR_WEB}/stats"
 
 EXPOSE 3875
 CMD [ "/usr/local/bin/entrypoint.sh" ]
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 VOLUME ["/var/cache/duplicacy", "/etc/duplicacy"]
